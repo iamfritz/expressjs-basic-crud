@@ -16,6 +16,7 @@ const authenticate = (req, res, next) => {
   if (account) {
     //If API key matches
     //check the number of times the API has been used in a particular day
+    let MAX = 100;
     let today = new Date().toISOString().split("T")[0];
     let usageCount = account.usage.findIndex((day) => day.date == today);
     if (usageCount >= 0) {
