@@ -6,13 +6,15 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 const router = express.Router();
-const routes = require("./routes/routes");
+const user = require("./routes/user");
 
 module.exports = router;
 
 const mongoString = process.env.DATABASE_URL;
 mongoose.connect(mongoString);
 const database = mongoose.connection;
+var bodyParser = require("body-parser");
+
 
 database.on("error", (error) => {
   console.log('DB error');
@@ -24,9 +26,10 @@ database.once("connected", () => {
 });
 const app = express();
 
-app.use(express.json());
+//app.use(express.json());
+app.use(bodyParser.json());
 
-app.use("/api", routes);
+app.use("/api", user);
 
 app.listen(3000, () => {
   console.log(`Server Started at ${3000}`);
