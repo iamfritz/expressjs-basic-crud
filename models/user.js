@@ -10,8 +10,14 @@ const dataSchema = new mongoose.Schema(
       required: true,
       type: Number,
     },
-    createdAt: { type: Date },
-    updatedAt: { type: Date },
+    position: 
+      { type: String },
+    level: 
+      { type: String },
+    createdAt: 
+      { type: Date },
+    updatedAt: 
+      { type: Date },
   },
   {
     timestamps: true,
