@@ -3,6 +3,7 @@ const lib = require("../app/middleware/lib");
 const router  = express.Router();
 const User = require("../app/models/user");
 const authenticator = require("../app/middleware/authenticator");
+const auth  = require("../app/middleware/auth");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 

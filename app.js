@@ -11,6 +11,7 @@ var bodyParser = require("body-parser");
 
 const post = require("./routes/post");
 const user = require("./routes/user");
+const demo = require("./routes/demo");
 //const admin = require("./routes/admin");
 const dbConnect = require("./app/db/dbConnect");
 
@@ -26,6 +27,7 @@ app.use(bodyParser.json());
 
 app.use("/api", post);
 app.use("/api/user", user);
+app.use("/demo", demo);
 //app.use("/admin", admin);
 
 router.use((req, res, next) => {
