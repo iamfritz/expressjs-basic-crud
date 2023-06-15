@@ -7,30 +7,30 @@ const mongoose  = require("mongoose");
 const cors      = require("cors");
 
 const router = express.Router();
-const user = require("./routes/user");
-
-module.exports = router;
-
-const mongoString = process.env.DATABASE_URL;
-mongoose.connect(mongoString);
-const database = mongoose.connection;
 var bodyParser = require("body-parser");
 
-database.on("error", (error) => {
-  console.log('DB error');
-  console.log(error);
-});
+const post = require("./routes/post");
+const user = require("./routes/user");
+//const admin = require("./routes/admin");
+const dbConnect = require("./app/db/dbConnect");
 
-database.once("connected", () => {
-  console.log("Database Connected");
-});
+// execute database connection
+dbConnect();
+module.exports = router;
+
 const app = express();
 
 app.use(cors());
 //app.use(express.json());
 app.use(bodyParser.json());
 
-app.use("/api", user);
+app.use("/api", post);
+app.use("/api/user", user);
+//app.use("/admin", admin);
+
+router.use((req, res, next) => {
+  res.status(400).json({ error: "Request not found" });
+});
 
 app.listen(3000, () => {
   console.log(`Server Started at ${3000}`);

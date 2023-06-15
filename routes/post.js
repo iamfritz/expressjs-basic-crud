@@ -1,7 +1,7 @@
 const express = require("express");
 const lib = require("../app/middleware/lib");
-const router  = express.Router();
-const User = require("../app/models/user");
+const router = express.Router();
+const Post = require("../app/models/post");
 const authenticator = require("../app/middleware/authenticator");
 
 module.exports = router;
@@ -14,15 +14,13 @@ router.use(authenticator, (req, res, next) => {
   next();
 });
 
-//user Method
-router.post("", async (req, res) => {
-  const data = new User({
-    email: req.body.email,
-    password: req.body.password,
-    name: req.body.name,
-    age: req.body.age,
-    position: req.body.position,
-    level: req.body.level,
+//Post Method
+router.post("/post", async (req, res) => {
+  const data = new Post({
+    title: req.body.title,
+    description: req.body.description,
+    category: req.body.category,
+    tags: req.body.tags    
   });
 
   try {
@@ -34,9 +32,9 @@ router.post("", async (req, res) => {
 });
 
 //Get all Method
-router.get("/all", async (req, res) => {
+router.get("/post/all", async (req, res) => {
   try {
-    const data = await User.find();
+    const data = await Post.find();
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -44,9 +42,9 @@ router.get("/all", async (req, res) => {
 });
 
 //Get by ID Method
-router.get("/:id", async (req, res) => {
+router.get("/post/:id", async (req, res) => {
   try {
-    const data = await User.findById(req.params.id);
+    const data = await Post.findById(req.params.id);
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -54,14 +52,14 @@ router.get("/:id", async (req, res) => {
 });
 
 //Update by ID Method
-router.patch("/update/:id", async (req, res) => {
+router.patch("/post/update/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const updatedData = req.body;
 
     const options = { new: true };
 
-    const result = await User.findByIdAndUpdate(id, updatedData, options);
+    const result = await Post.findByIdAndUpdate(id, updatedData, options);
 
     res.send(result);
   } catch (error) {
@@ -70,10 +68,10 @@ router.patch("/update/:id", async (req, res) => {
 });
 
 //Delete by ID Method
-router.delete("/delete/:id", async (req, res) => {
+router.delete("/post/delete/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const data = await User.findByIdAndDelete(id);
+    const data = await Post.findByIdAndDelete(id);
 
     res
       .status(200)
@@ -83,6 +81,6 @@ router.delete("/delete/:id", async (req, res) => {
   }
 });
 
-router.use((req, res, next) => {
-  res.status(400).json({ error: "Request not found" });
-});
+// router.use((req, res, next) => {
+//   res.status(400).json({ error: "Request not found" });
+// });
