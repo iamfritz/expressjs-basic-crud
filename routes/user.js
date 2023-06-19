@@ -107,6 +107,7 @@ router.post("/register", (request, response) => {
   bcrypt
     .hash(request.body.password, 10)
     .then((hashedPassword) => {
+
       // create a new user instance and collect the data
       const user = new User({
         email: request.body.email,
@@ -123,6 +124,7 @@ router.post("/register", (request, response) => {
         // return success if the new user is added to the database successfully
         .then((result) => {
           response.status(201).send({
+            success: true,
             message: "User Created Successfully",
             result,
           });
