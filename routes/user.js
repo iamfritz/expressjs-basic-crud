@@ -149,7 +149,7 @@ router.post("/register", (request, response) => {
 router.post("/login", (request, response) => {
 
   if (!request.body.email || !request.body.password) {
-    response.status(400).json({ error: "Email Address and Password is required." });
+    response.status(401).json({ error: "Email Address and Password is required." });
   }
     // check if email exists
     User.findOne({ email: request.body.email })
@@ -164,9 +164,9 @@ router.post("/login", (request, response) => {
           .then((passwordCheck) => {
             // check if password matches
             if (!passwordCheck) {
-              return response.status(400).send({
+              return response.status(401).send({
                 message: "Passwords does not match",
-                error,
+                error: "Unauthorized"
               });
             }
 
@@ -182,6 +182,7 @@ router.post("/login", (request, response) => {
 
             //   return success response
             response.status(200).send({
+              success: true,
               message: "Login Successful",
               email: user.email,
               token,
@@ -189,17 +190,17 @@ router.post("/login", (request, response) => {
           })
           // catch error if password does not match
           .catch((error) => {
-            response.status(400).send({
+            response.status(401).send({
               message: "Passwords does not match",
-              error,
+              error: "Unauthorized"
             });
           });
       })
       // catch error if email does not exist
       .catch((e) => {
-        response.status(404).send({
+        response.status(401).send({
           message: "Email not found",
-          e,
+          error: "Unauthorized",
         });
       });
 });
