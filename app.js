@@ -5,13 +5,13 @@ require("dotenv").config();
 const express   = require("express");
 const mongoose  = require("mongoose");
 const cors      = require("cors");
+const bodyParser = require("body-parser");
 
 const router = express.Router();
-var bodyParser = require("body-parser");
 
-const post = require("./routes/post");
-const user = require("./routes/user");
-const demo = require("./routes/demo");
+const post = require("./app/routes/post");
+const user = require("./app/routes/user");
+const demo = require("./app/routes/demo");
 //const admin = require("./routes/admin");
 const dbConnect = require("./app/db/dbConnect");
 
@@ -40,6 +40,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+/* routes */
 app.use("/api", post);
 app.use("/api/user", user);
 app.use("/demo", demo);
@@ -49,6 +50,8 @@ router.use((req, res, next) => {
   res.status(400).json({ error: "Request not found" });
 });
 
-app.listen(3000, () => {
-  console.log(`Server Started at ${3000}`);
+const PORT = process.env.PORT || 5000;
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
 });

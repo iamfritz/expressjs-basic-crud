@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express.Router();
-const authenticator = require("../app/middleware/authenticator");
-const auth = require("../app/middleware/auth");
+const authenticator = require("../middleware/authenticator");
+const auth = require("../middleware/auth");
 
 module.exports = app;
 
