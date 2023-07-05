@@ -18,7 +18,7 @@ module.exports = async (request, response, next) => {
     next();
   } catch (error) {
     response.status(401).json({
-      error: "Invalid request!",
+      error: "Unauthorized Request",
     });
   }
 };

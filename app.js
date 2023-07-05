@@ -1,5 +1,3 @@
-//https://www.freecodecamp.org/news/build-a-restful-api-using-node-express-and-mongodb/
-
 require("dotenv").config();
 
 const express   = require("express");
@@ -41,6 +39,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 /* routes */
+app.get('/', (req,res) => {
+  res
+    .json({ status: "success", message: "Online" });
+})
 app.use("/api", post);
 app.use("/api/user", user);
 app.use("/demo", demo);

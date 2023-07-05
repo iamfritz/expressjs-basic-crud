@@ -23,3 +23,7 @@
 npm i express mongoose nodemon dotenv body-parser
 
 npm start
+
+
+## REFERENCE
+https://www.freecodecamp.org/news/build-a-restful-api-using-node-express-and-mongodb/

@@ -292,10 +292,12 @@ const loginUser = async (request, response) => {
 
           //   return success response
           response.status(200).send({
-            success: true,
+            status: "success",
             message: "Login Successful",
-            email: user.email,
-            token,
+            data: {
+              email: user.email,
+              token
+            }
           });
         })
         // catch error if password does not match
