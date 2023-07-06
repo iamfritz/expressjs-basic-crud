@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const lib = require("../middleware/lib");
+const lib = require("../util/lib");
 const authenticator = require("../middleware/authenticator");
 
 module.exports = router;

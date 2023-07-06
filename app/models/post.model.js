@@ -5,6 +5,8 @@ const dataSchema = new mongoose.Schema(
     title: {
       required: true,
       type: String,
+      required: [true, "Please provide an Title!"],
+      unique: [true, "Title already Exist"],
     },
     description: {
       required: true,

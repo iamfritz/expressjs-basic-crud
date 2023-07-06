@@ -280,13 +280,14 @@ const loginUser = async (request, response) => {
             });
           }
 
+          const JWT_SECRET = process.env.JWT_SECRET || "SECRET-TOKEN";
           //   create JWT token
           const token = jwt.sign(
             {
               userId: user._id,
               userEmail: user.email,
             },
-            "RANDOM-TOKEN",
+            JWT_SECRET,
             { expiresIn: "24h" }
           );
 
