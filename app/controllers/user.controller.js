@@ -257,9 +257,9 @@ const loginUser = async (request, response) => {
   };  
     
   if (!request.body.email || !request.body.password) {
-    response
-      .status(401)
-      .json({ message: "Email Address and Password is required." });
+    result["message"] = "Email Address and Password is required.";
+
+    response.status(401).json(result);
   }
   // check if email exists
   User.findOne({ email: request.body.email })
@@ -274,10 +274,9 @@ const loginUser = async (request, response) => {
         .then((passwordCheck) => {
           // check if password matches
           if (!passwordCheck) {
-            return response.status(401).send({
-              message: "Passwords does not match",
-              error: "Unauthorized",
-            });
+            result["message"] = "Passwords does not match";
+
+            response.status(401).json(result);
           }
 
           const JWT_SECRET = process.env.JWT_SECRET || "SECRET-TOKEN";
@@ -303,19 +302,47 @@ const loginUser = async (request, response) => {
         })
         // catch error if password does not match
         .catch((error) => {
-          response.status(401).send({
-            message: "Passwords does not match",
-            error: "Unauthorized",
-          });
+          result["message"] = "Passwords does not match";
+
+          response.status(401).json(result);
         });
     })
     // catch error if email does not exist
     .catch((e) => {
-      response.status(401).send({
-        message: "Email not found",
-        error: "Unauthorized",
-      });
+      result["message"] = "Email Address not found.";
+
+      response.status(401).json(result);
     });
+};
+
+const userInfo = async (request, response) => {
+  let result = {
+    status: "error",
+    message: "",
+    data: {},
+  };
+
+  response.json(result);
+  /* const JWT_SECRET = process.env.JWT_SECRET || "SECRET-TOKEN";
+  //   create JWT token
+  const token = jwt.sign(
+    {
+      userId: user._id,
+      userEmail: user.email,
+    },
+    JWT_SECRET,
+    { expiresIn: "24h" }
+  );
+
+  //   return success response
+  response.status(200).send({
+    status: "success",
+    message: "Login Successful",
+    data: {
+      email: user.email,
+      token,
+    },
+  }); */
 };
 
 module.exports = {
@@ -326,4 +353,5 @@ module.exports = {
   deleteUser,
   registerUser,
   loginUser,
+  userInfo,
 };

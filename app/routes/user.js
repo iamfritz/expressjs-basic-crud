@@ -21,6 +21,9 @@ router.use(authenticator, (req, res, next) => {
 });
 
 //get all user
+router.get("/info", getAllUser);
+
+//get all user
 router.get("/", getAllUser);
 
 //post a new user
