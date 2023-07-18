@@ -35,3 +35,10 @@ router.patch("/post/update/:id", updatePost);
 
 //Delete by ID Method
 router.delete("/post/delete/:id", deletePost);
+
+/* 
+router
+  .route("/")
+  .get(todoController.getTodos)
+  .post(todoController.addTodo)
+  .put(todoController.updateTodo); */
