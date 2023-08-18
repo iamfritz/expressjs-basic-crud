@@ -3,6 +3,9 @@ const router = express.Router();
 const lib = require("../util/lib");
 const authenticator = require("../middleware/authJWT");
 
+const multer = require('multer');
+const path = require('path');
+
 module.exports = router;
 
 const {
@@ -13,18 +16,30 @@ const {
   deletePost,
 } = require("../controllers/post.controller");
 
+// Set up multer for image uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, process.env.UPLOAD_PATH);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage: storage });
+
 /* group method */
 router
   .route("/")
   .get(authenticator, getAllPost)
   .post(authenticator, createPost);
+  //.post(authenticator, upload.single('image'), createPost);
 
 router
   .route("/:id")
   .get(authenticator, getPost)
   .delete(authenticator, deletePost)
   .put(authenticator, updatePost);
-  
+
 //sample only
 //const logStuff = [lib.logOriginalUrl, lib.logMethod];
 

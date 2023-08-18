@@ -31,6 +31,7 @@ async function runMigration() {
     console.log("Error during migration");
     console.error(error.message);
   }
+  exit();
 }
 
 runMigration();

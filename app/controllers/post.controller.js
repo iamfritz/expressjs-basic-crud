@@ -91,6 +91,9 @@ const createPost = async (req, res) => {
     data: {},
   };
   try {
+    const imageUrl = req.file.path;
+    console.log(imageUrl);
+    
     const data = new Post({
       title: req.body.title,
       description: req.body.description,
