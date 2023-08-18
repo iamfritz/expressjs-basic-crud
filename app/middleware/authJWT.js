@@ -4,6 +4,8 @@ module.exports = async (request, response, next) => {
   try {
     //   get the token from the authorization header
     const token = await request.headers.authorization.split(" ")[1];
+    //const token2 = request.body.token || request.query.token || request.headers["x-access-token"];
+
     // Check if no token
     if (!token) {
       response
@@ -21,14 +23,15 @@ module.exports = async (request, response, next) => {
             message: "Token is not valid",
           });
         } else {
-          req.user = decoded.user;
+          //console.log(decoded);
+          request.user = decoded;
           next();
         }
       });
     } catch (err) {
-      console.error("something wrong with auth middleware");
-      response.status(500)
-        .json({ status: "error", message: "Server Error" });
+      console.error("Invalid Token: " + token);
+      console.error(err);
+      response.status(500).json({ status: "error", message: "Invalid Token" });
     }
   } catch (error) {
     response
@@ -36,3 +39,6 @@ module.exports = async (request, response, next) => {
       .json({ status: "error", message: "Unauthorized Request" });
   }
 };
+
+
+//https://www.loginradius.com/blog/engineering/guest-post/nodejs-authentication-guide/

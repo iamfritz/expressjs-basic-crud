@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 
-const auth = require("../middleware/auth");
+const auth = require("../middleware/authJWT");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -35,7 +35,7 @@ const getAllUser = async (req, res) => {
           .json({ status: "error", message: "Page number out of range" });
       }
 
-      let UserList = items.slice(startIndex, endIndex);
+      let users = items.slice(startIndex, endIndex);
       result["status"] = "success";
       result["paging"] = {
         total: items.length,
@@ -43,7 +43,9 @@ const getAllUser = async (req, res) => {
         page: page,
         limit: limit,
       };
-      result["data"] = UserList;
+      const sanitizedUsers = users.map(sanitizeUser);    
+
+      result["data"] = sanitizedUsers;
 
       res.json(result);
     } else {
@@ -70,13 +72,13 @@ const getUser = async (req, res) => {
   try {
     const data = await User.findById(req.params.id);
     if (data) {
+      const sanitizedUser = sanitizeUser(data);
       result["status"] = "success";
-      result["data"] = data;
+      result["data"] = sanitizedUser;
       res.json(result);
     } else {
       result["status"] = "error";
-      result["message"] = `Record not found.`;
-
+      result["message"] = `Record not found.`;      
       res.status(401).json(result);
     }
   } catch (error) {
@@ -315,36 +317,39 @@ const loginUser = async (request, response) => {
     });
 };
 
-const userInfo = async (request, response) => {
+const userInfo = async (req, res) => {
   let result = {
     status: "error",
     message: "",
     data: {},
   };
 
-  response.json(result);
-  /* const JWT_SECRET = process.env.JWT_SECRET || "SECRET-TOKEN";
-  //   create JWT token
-  const token = jwt.sign(
-    {
-      userId: user._id,
-      userEmail: user.email,
-    },
-    JWT_SECRET,
-    { expiresIn: "24h" }
-  );
+  try {
+    const userId = req.user.userId;
+    const data = await User.findById(userId);
+    if (data) {
+      /* const sanitizedUser = sanitizeUser(data); */
+      result["status"] = "success";
+      result["data"] = req.user;
+      res.json(result);
+    } else {
+      result["status"] = "error";
+      result["message"] = `Record not found.`;
 
-  //   return success response
-  response.status(200).send({
-    status: "success",
-    message: "Login Successful",
-    data: {
-      email: user.email,
-      token,
-    },
-  }); */
+      res.status(401).json(result);
+    }
+  } catch (error) {
+    result["status"] = "error";
+    result["message"] = error.message;
+
+    res.status(500).json(result);
+  }
 };
 
+function sanitizeUser(user) {
+    const { _id, email, name, age, position, level } = user;
+    return { _id, email, name, age, position, level };  
+}
 module.exports = {
   getAllUser,
   getUser,

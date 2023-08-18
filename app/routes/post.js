@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const lib = require("../util/lib");
-const authenticator = require("../middleware/authenticator");
+const authenticator = require("../middleware/authKey");
 
 module.exports = router;
 
@@ -16,25 +16,25 @@ const {
 //sample only
 const logStuff = [lib.logOriginalUrl, lib.logMethod];
 
-router.use(authenticator, (req, res, next) => {
+/* router.use(authenticator, (req, res, next) => {
   console.log("Time:", Date.now());
   next();
-});
+}); */
 
 //Post Method
-router.post("/post", createPost);
+router.post("/", createPost);
 
 //Get all Method
-router.get("/post/all", getAllPost);
+router.get("/", getAllPost);
 
 //Get by ID Method
-router.get("/post/:id", getPost);
+router.get("/:id", getPost);
 
 //Update by ID Method
-router.patch("/post/update/:id", updatePost);
+router.patch("/:id", updatePost);
 
 //Delete by ID Method
-router.delete("/post/delete/:id", deletePost);
+router.delete("/:id", deletePost);
 
 /* 
 router

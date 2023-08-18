@@ -40,11 +40,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 /* routes */
 app.get('/', (req,res) => {
-  res
-    .json({ status: "success", message: "Online" });
-})
-app.use("/api", post);
-app.use("/api/user", user);
+  res.json({ status: "success", message: "Online" });
+});
+app.get("/api", (req, res) => {
+  res.json({ status: "success", message: "Online" });
+});
+app.use("/api/posts", post);
+app.use("/api/users", user);
 app.use("/demo", demo);
 //app.use("/admin", admin);
 

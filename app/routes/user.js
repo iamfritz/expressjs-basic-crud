@@ -1,13 +1,15 @@
 const express = require("express");
 const lib = require("../util/lib");
 const router  = express.Router();
-const authenticator = require("../middleware/authenticator");
+//const authenticator = require("../middleware/authKey");
+const authenticator = require("../middleware/authJWT");
 
 module.exports = router;
 
 const {
   getAllUser,
   getUser,
+  userInfo,
   createUser,
   updateUser,
   deleteUser,
@@ -15,13 +17,13 @@ const {
   loginUser,
 } = require("../controllers/user.controller");
 
-router.use(authenticator, (req, res, next) => {
+/* router.use(authenticator, (req, res, next) => {
   console.log("Time:", Date.now());
   next();
-});
+}); */
 
 //get all user
-router.get("/info", getAllUser);
+router.get("/info", authenticator, userInfo);
 
 //get all user
 router.get("/", getAllUser);
@@ -33,10 +35,10 @@ router.post("/", createUser );
 router.get("/:id", getUser);
 
 //update user
-router.patch("/update/:id", updateUser );
+router.patch("/:id", updateUser );
 
 //delete user
-router.delete("/delete/:id", deleteUser);
+router.delete("/:id", deleteUser);
 
 //register and login
 router.post("/register", registerUser);
