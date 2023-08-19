@@ -1,8 +1,22 @@
 const User = require("../models/user.model");
+const Role = require("../models/role.model");
 
 const auth = require("../middleware/authJWT");
 const bcrypt = require("bcrypt");
+const saltRounds = 10; // Number of salt rounds, higher is more secure but slower
 const jwt = require("jsonwebtoken");
+
+// Function to hash a password
+async function hashPassword(password) {
+  try {
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hash = await bcrypt.hash(password, salt);
+    return hash;
+  } catch (error) {
+    console.error('Error hashing password:', error);
+    throw error;
+  }
+}
 
 const getAllUser = async (req, res) => {
   let result = {
@@ -12,8 +26,10 @@ const getAllUser = async (req, res) => {
   };
 
   try {
-    const items = await User.find();
-
+    const userItems = await User.find().populate("roles");
+    const items = userItems.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
     if (items) {
       let { page, limit } = req.query;
 
@@ -69,8 +85,13 @@ const getUser = async (req, res) => {
     message: "",
     data: {},
   };
+  
+  /* const isAdmin = req.user.roles.some((role) => role.name === "admin");
+  if (!isAdmin) {
+    return res.status(403).json({ error: "Access denied" });
+  } */  
   try {
-    const data = await User.findById(req.params.id);
+    const data = await User.findById(req.params.id).populate("roles");
     if (data) {
       const sanitizedUser = sanitizeUser(data);
       result["status"] = "success";
@@ -96,33 +117,46 @@ const createUser = async (req, res) => {
     message: "",
     data: {},
   };
+
+  const { email, password, name, roles } = req.body;
+  const hashedPassword = await hashPassword(password);
+
   try {
-    const data = new User({
-      email: req.body.email,
-      password: req.body.password,
-      name: req.body.name,
-      age: req.body.age,
-      position: req.body.position,
-      level: req.body.level,
+    // Find roles by name
+    const foundRoles = await Role.find({ name: { $in: roles } });
+
+    // Create the user and associate roles
+    const user = new User({
+      email,
+      name,
+      password : hashedPassword, // Remember to hash the password before saving it
+      roles: foundRoles.map((role) => role._id),
     });
 
-    const newUser = await data.save();
-    if (newUser) {
-      result["status"] = "success";
-      result["data"] = newUser;
+    // save the new user
+    user.save()
+      // return success if the new user is added to the database successfully
+      .then((data) => {
+        result["status"] = "success";
+        result["data"] = data;
 
-      res.json(result);
-    } else {
-      result["status"] = "error";
-      result["message"] = `Unable to add a new record.`;
-      res.status(401).json(result);
-    }
+        res.json(result);
+      })
+      // catch error if the new user wasn't added successfully to the database
+      .catch((error) => {
+        console.error(error);
+        result["status"] = "error";
+        result["message"] = "Error creating user";
+
+        res.status(500).json(result);
+      });
   } catch (error) {
     result["status"] = "error";
     result["message"] = error.message;
 
     res.status(500).json(result);
   }
+
 };
 
 //update user
@@ -133,27 +167,26 @@ const updateUser = async (req, res) => {
     data: {},
   };
 
-  try {
-    const id = req.params.id;
-    const updatedData = req.body;
+  const id = req.params.id;
+  const { email, password, name, roles } = req.body;
 
-    const options = { new: true };
-    if (req.body.password) {
-      req.body.password = await bcrypt
-        .hash(req.body.password, 10)
-        .then((hashedPassword) => {
-          return hashedPassword;
-        })
-        // catch error if the password hash isn't successful
-        .catch((e) => {
-          response.status(500).send({
-            message: "Password was not hashed successfully",
-            e,
-          });
-        });
+  const hashedPassword = await hashPassword(password);
+
+  try {
+    // Find roles by name
+    const foundRoles = await Role.find({ name: { $in: roles } });
+
+    let dataUpdate = {
+      email,
+      name,
+      roles: foundRoles.map((role) => role._id),
+    };
+    if(password) {
+      dataUpdate['password'] = hashedPassword; // Remember to hash the password before saving it
     }
 
-    const data = await User.findByIdAndUpdate(id, updatedData, options);
+    const options = { new: true };
+    const data = await User.findByIdAndUpdate(id, dataUpdate, options);
 
     if (data) {
       result["status"] = "success";
@@ -172,7 +205,6 @@ const updateUser = async (req, res) => {
 
     res.status(500).json(result);
   }
-
 };
 
 //delete user
@@ -202,51 +234,52 @@ const deleteUser = async (req, res) => {
 };
 
 // register endpoint
-const registerUser = async (request, response) => {
+const registerUser = async (req, res) => {
   let result = {
     status: "error",
     message: "",
     data: {},
-  };  
-  // hash the password
-  bcrypt
-    .hash(request.body.password, 10)
-    .then((hashedPassword) => {
-      // create a new user instance and collect the data
-      const user = new User({
-        email: request.body.email,
-        password: hashedPassword,
-        name: request.body.name,
-        age: request.body.age,
-        position: request.body.position,
-        level: request.body.level,
-      });
+  };
 
-      // save the new user
-      user
-        .save()
-        // return success if the new user is added to the database successfully
-        .then((data) => {
-          result["status"] = "success";
-          result["data"] = data;
+  const { email, password, name } = req.body;
+  const hashedPassword = await hashPassword(password);
 
-          response.json(result);          
-        })
-        // catch error if the new user wasn't added successfully to the database
-        .catch((error) => {
-          result["status"] = "error";
-          result["message"] = "Error creating user";
+  try {
+    // Find roles by name
+    const foundRoles = await Role.find({ name: { $in: ["user"] } });
 
-          response.status(500).json(result);           
-        });
-    })
-    // catch error if the password hash isn't successful
-    .catch((e) => {
-      result["status"] = "error";
-      result["message"] = "Password was not hashed successfully";
-
-      response.status(500).json(result);      
+    // Create the user and associate roles
+    const user = new User({
+      email,
+      name,
+      password: hashedPassword, // Remember to hash the password before saving it
+      roles: foundRoles.map((role) => role._id),
     });
+
+    // save the new user
+    user
+      .save()
+      // return success if the new user is added to the database successfully
+      .then((data) => {
+        result["status"] = "success";
+        result["data"] = data;
+
+        res.json(result);
+      })
+      // catch error if the new user wasn't added successfully to the database
+      .catch((error) => {
+        console.error(error);
+        result["status"] = "error";
+        result["message"] = "Error creating user";
+
+        res.status(500).json(result);
+      });
+  } catch (error) {
+    result["status"] = "error";
+    result["message"] = error.message;
+
+    res.status(500).json(result);
+  }
     
 };
 
@@ -347,8 +380,8 @@ const userInfo = async (req, res) => {
 };
 
 function sanitizeUser(user) {
-    const { _id, email, name, age, position, level } = user;
-    return { _id, email, name, age, position, level };  
+    const { _id, email, name, roles } = user;
+    return { _id, email, name, roles };  
 }
 module.exports = {
   getAllUser,

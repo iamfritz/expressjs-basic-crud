@@ -17,12 +17,12 @@ const dataSchema = new mongoose.Schema(
       required: true,
       type: String,
     },
-    age: {
-      required: true,
-      type: Number,
-    },
-    position: { type: String },
-    level: { type: String },
+    roles: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Role",
+      },
+    ],
     createdAt: { type: Date },
     updatedAt: { type: Date },
   },

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "migrate": "node ./app/db/migrate.api.js",
+    "migrateApi": "node ./app/db/migrate.api.js",
+    "migrateRoles": "node ./app/db/migrate.roles.js",
     "test": "cross-env NODE_ENV=test process.env.PORT=9090 jest --testTimeout=5000"
   },
   "author": "",
