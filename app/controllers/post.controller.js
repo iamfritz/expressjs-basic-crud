@@ -11,8 +11,12 @@ const getAllPost = async (req, res) => {
 
   try {
     //const items = await Post.find();
-  const items = await Post.find({})
+  const postItems = await Post.find({})
     .populate("category");
+    const items = postItems.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
     if (items) {
       let { page, limit } = req.query;
 
@@ -96,13 +100,14 @@ const createPost = async (req, res) => {
   try {
     const { title, description, category } = req.body;
     const categories = category.split(",").map((cat) => cat.trim()); // Split comma-separated categories
-    //const imageUrl = req.file.path;
-    //console.log(imageUrl);
+    const imageUrl = req.file ? req.file.path : '';
+    console.log(imageUrl);
 
     const data = new Post({
       title: title,
       description: description,
       category: categories,
+      image: imageUrl,
       //category: req.body.category,
       //tags: req.body.tags,
     });

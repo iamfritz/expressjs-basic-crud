@@ -31,8 +31,8 @@ const upload = multer({ storage: storage });
 router
   .route("/")
   .get(authenticator, getAllPost)
-  .post(authenticator, createPost);
-  //.post(authenticator, upload.single('image'), createPost);
+  //.post(authenticator, createPost);
+  .post(authenticator, upload.single('image'), createPost);
 
 router
   .route("/:id")

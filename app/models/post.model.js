@@ -12,6 +12,9 @@ const dataSchema = new mongoose.Schema(
       required: true,
       type: String,
     },
+    image: {
+      type: String,
+    },
     category: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
     //category: { type: String },
     //tags: { type: String },
