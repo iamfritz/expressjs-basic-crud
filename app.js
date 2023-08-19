@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 
 const post = require("./app/routes/post");
+const category = require("./app/routes/category");
 const user = require("./app/routes/user");
 const demo = require("./app/routes/demo");
 //const admin = require("./routes/admin");
@@ -45,8 +46,9 @@ app.get('/', (req,res) => {
 app.get("/api", (req, res) => {
   res.json({ status: "success", message: "Online" });
 });
-app.use("/api/posts", post);
 app.use("/api/users", user);
+app.use("/api/posts", post);
+app.use("/api/categories", category);
 app.use("/demo", demo);
 //app.use("/admin", admin);
 

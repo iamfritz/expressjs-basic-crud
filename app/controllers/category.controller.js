@@ -1,8 +1,6 @@
-const Post = require("../models/post.model");
-const mongoose = require("mongoose");
-const ObjectId = mongoose.Types.ObjectId;
+const Category = require("../models/category.model");
 
-const getAllPost = async (req, res) => {
+const getAllCategory = async (req, res) => {
   let result = {
     status: "error",
     message: "",
@@ -10,10 +8,15 @@ const getAllPost = async (req, res) => {
   };
 
   try {
-    //const items = await Post.find();
-  const items = await Post.find({})
-    .populate("category");
-    if (items) {
+    const items = await Category.find();
+
+    if (items.length === 0) {    
+      result["status"] = "error";
+      result["message"] = `No Record found.`;
+
+      res.status(400).json(result);
+    } else {
+    
       let { page, limit } = req.query;
 
       page = page ? parseInt(page) : 1;
@@ -45,11 +48,6 @@ const getAllPost = async (req, res) => {
       result["data"] = postItems;
 
       res.json(result);
-    } else {
-      result["status"] = "error";
-      result["message"] = `No Record found.`;
-
-      res.status(400).json(result);
     }
   } catch (error) {
     result["status"] = "error";
@@ -60,14 +58,15 @@ const getAllPost = async (req, res) => {
 };
 
 //get post
-const getPost = async (req, res) => {
+const getCategory = async (req, res) => {
   let result = {
     status: "error",
     message: "",
     data: {},
   };
+  
   try {
-    const data = await Post.findById(req.params.id).populate("category");
+    const data = await Category.findById(req.params.id);
     if (data) {
       result["status"] = "success";
       result["data"] = data;
@@ -87,30 +86,22 @@ const getPost = async (req, res) => {
 };
 
 //create a new post
-const createPost = async (req, res) => {
+const createCategory = async (req, res) => {
   let result = {
     status: "error",
     message: "",
     data: {},
   };
-  try {
-    const { title, description, category } = req.body;
-    const categories = category.split(",").map((cat) => cat.trim()); // Split comma-separated categories
-    //const imageUrl = req.file.path;
-    //console.log(imageUrl);
-
-    const data = new Post({
-      title: title,
-      description: description,
-      category: categories,
-      //category: req.body.category,
-      //tags: req.body.tags,
+  try {    
+    const { name } = req.body;
+    const data = new Category({
+      name: name
     });
 
-    const newPost = await data.save();
-    if (newPost) {
+    const newCategory = await data.save();
+    if (newCategory) {
       result["status"] = "success";
-      result["data"] = newPost;
+      result["data"] = newCategory;
 
       res.json(result);
     } else {
@@ -127,19 +118,19 @@ const createPost = async (req, res) => {
 };
 
 //update post
-const updatePost = async (req, res) => {
+const updateCategory = async (req, res) => {
   let result = {
     status: "error",
     message: "",
     data: {},
   };
   try {
+
     const id = req.params.id;
     const updatedData = req.body;
-
     const options = { new: true };
 
-    const data = await Post.findByIdAndUpdate(id, updatedData, options);
+    const data = await Category.findByIdAndUpdate(id, updatedData, options);
     if (data) {
       result["status"] = "success";
       result["message"] = `Record has been updated.`;
@@ -160,14 +151,14 @@ const updatePost = async (req, res) => {
 };
 
 //delete post
-const deletePost = async (req, res) => {
+const deleteCategory = async (req, res) => {
   let result = {
     status: "error",
     message: "",
     data: {},
   };
   try {
-    const data = await Post.findByIdAndDelete(req.params.id);
+    const data = await Category.findByIdAndDelete(req.params.id);
     if (data) {
       result["status"] = "success";
       result["message"] = `Record has been deleted.`;
@@ -186,9 +177,9 @@ const deletePost = async (req, res) => {
 };
 
 module.exports = {
-  getAllPost,
-  getPost,
-  createPost,
-  updatePost,
-  deletePost,
+  getAllCategory,
+  getCategory,
+  createCategory,
+  updateCategory,
+  deleteCategory,
 };
