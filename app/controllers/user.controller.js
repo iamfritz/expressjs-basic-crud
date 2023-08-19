@@ -72,7 +72,7 @@ const getAllUser = async (req, res) => {
     }
   } catch (error) {
     result["status"] = "error";
-    result["message"] = error.message;
+    result["message"] = error.message;                                                                                                                                   
 
     res.status(500).json(result);
   }
