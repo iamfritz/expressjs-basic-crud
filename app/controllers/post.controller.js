@@ -9,10 +9,8 @@ const getAllPost = async (req, res) => {
     data: {},
   };
 
-  try {
-    //const items = await Post.find();
-  const postItems = await Post.find({})
-    .populate("category");
+  try {  
+    const postItems = await PostService.getManyWithPopulation({}, "category");
     const items = postItems.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
@@ -72,7 +70,6 @@ const getPost = async (req, res) => {
   };
   try {
     const data = await PostService.getWithPopulation(req.params.id, "category");
-    //const data = await Post.findById(req.params.id).populate("category");
     if (data) {
       result["status"] = "success";
       result["data"] = data;
@@ -104,16 +101,14 @@ const createPost = async (req, res) => {
     const imageUrl = req.file ? req.file.path : '';
     console.log(imageUrl);
 
-    const data = new Post({
+    const data = {
       title: title,
       description: description,
       category: categories,
-      image: imageUrl,
-      //category: req.body.category,
-      //tags: req.body.tags,
-    });
+      image: imageUrl
+    };
 
-    const newPost = await data.save();
+    const newPost = await PostService.create(data);
     if (newPost) {
       result["status"] = "success";
       result["data"] = newPost;
@@ -145,7 +140,7 @@ const updatePost = async (req, res) => {
 
     const options = { new: true };
 
-    const data = await Post.findByIdAndUpdate(id, updatedData, options);
+    const data = await PostService.update(id, updatedData, options);
     if (data) {
       result["status"] = "success";
       result["message"] = `Record has been updated.`;
@@ -173,7 +168,7 @@ const deletePost = async (req, res) => {
     data: {},
   };
   try {
-    const data = await PostService.Delete(Post, req.params.id);
+    const data = await PostService.delete(req.params.id);
     if (data) {
       result["status"] = "success";
       result["message"] = `Record has been deleted.`;
