@@ -1,6 +1,6 @@
 const Post = require("../models/post.model");
+const PostService = require("../services/post.service");
 const mongoose = require("mongoose");
-const ObjectId = mongoose.Types.ObjectId;
 
 const getAllPost = async (req, res) => {
   let result = {
@@ -71,7 +71,8 @@ const getPost = async (req, res) => {
     data: {},
   };
   try {
-    const data = await Post.findById(req.params.id).populate("category");
+    const data = await PostService.getWithPopulation(req.params.id, "category");
+    //const data = await Post.findById(req.params.id).populate("category");
     if (data) {
       result["status"] = "success";
       result["data"] = data;
@@ -172,7 +173,7 @@ const deletePost = async (req, res) => {
     data: {},
   };
   try {
-    const data = await Post.findByIdAndDelete(req.params.id);
+    const data = await PostService.Delete(Post, req.params.id);
     if (data) {
       result["status"] = "success";
       result["message"] = `Record has been deleted.`;
